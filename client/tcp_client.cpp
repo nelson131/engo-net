@@ -1,0 +1,17 @@
+#include "tcp_client.hpp"
+
+TCP_Client::TCP_Client(const std::string& m_addr, uint64_t port, Logger& logger)
+    : m_addr(m_addr),
+      port(port),
+      s_addr(),
+      m_socket(std::make_unique<Socket>()),
+      logger(logger) {
+    s_addr.sin_family = AF_INET;
+    s_addr.sin_addr.s_addr = inet_addr(m_addr.c_str());
+    s_addr.sin_port = htons(port);
+}
+
+bool TCP_Client::conn() {
+    return connect(m_socket->get(), (struct sockaddr*)&s_addr,
+                   sizeof(s_addr)) != 0;
+}
