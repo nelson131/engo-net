@@ -1,6 +1,6 @@
 #include "tcp_client.hpp"
 
-TCP_Client::TCP_Client(const std::string& m_addr, uint64_t port, Logger& logger)
+TCP_Client::TCP_Client(const std::string& m_addr, uint16_t port, Logger& logger)
     : m_addr(m_addr),
       port(port),
       s_addr(),
@@ -13,5 +13,5 @@ TCP_Client::TCP_Client(const std::string& m_addr, uint64_t port, Logger& logger)
 
 bool TCP_Client::conn() {
     return connect(m_socket->get(), (struct sockaddr*)&s_addr,
-                   sizeof(s_addr)) != 0;
+                   sizeof(s_addr)) == 0;
 }

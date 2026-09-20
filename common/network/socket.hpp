@@ -9,7 +9,15 @@ class Socket {
     Socket();
     ~Socket();
 
-    const int get() const noexcept;
+    Socket(const Socket&) = delete;
+    Socket& operator=(const Socket&) = delete;
+
+    Socket(Socket&& other) noexcept;
+    Socket& operator=(Socket&& other) noexcept;
+
+    bool make_non_blocking();
+
+    int get() const noexcept;
 
    private:
     int m_socket;
