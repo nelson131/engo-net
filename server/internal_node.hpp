@@ -9,7 +9,7 @@
 #include "../common/logger.hpp"
 #include "tcp_server.hpp"
 
-#define MAX_EVENTS 33
+#define MAX_EVENTS 64
 
 class InternalNode {
    public:
@@ -18,7 +18,7 @@ class InternalNode {
 
     void run();
 
-    bool is_enabled() const;
+    bool is_enabled() const noexcept;
 
    private:
     Logger& logger;
@@ -31,4 +31,7 @@ class InternalNode {
     std::unordered_set<int> clients;
 
     bool enabled;
+
+   private:
+    int receive();
 };

@@ -10,10 +10,10 @@ InternalNode::InternalNode(const std::string& m_addr, uint16_t port,
       events(),
       enabled(1) {
     std::string msg = m_addr + "/" + std::to_string(port);
-    if (!tcps->make_bind())
+    if (!tcps->bind())
         throw std::runtime_error("failed to bind the internal node: " + msg);
 
-    if (!tcps->listening())
+    if (!tcps->listen())
         throw std::runtime_error("failed to listen in the internal node: " +
                                  msg);
 
@@ -55,7 +55,7 @@ void InternalNode::run() {
         for (size_t i = 0; i < num_events; i++) {
             if (events[i].data.fd == tcps->get_socket().get()) {
                 while (1) {
-                    int client_fd = tcps->receive();
+                    int client_fd = receive();
                     if (client_fd == -1) {
                         if (errno == EAGAIN || errno == EWOULDBLOCK) break;
                         if (errno == EINTR) continue;
@@ -65,7 +65,8 @@ void InternalNode::run() {
                         break;
                     }
 
-                    event.events = EPOLLIN;
+                    epoll_event event{};
+                    event.events = EPOLLIN | EPOLLRDHUP;
                     event.data.fd = client_fd;
                     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event) ==
                         -1) {
@@ -84,4 +85,11 @@ void InternalNode::run() {
     }
 }
 
-bool InternalNode::is_enabled() const { return enabled; }
+bool InternalNode::is_enabled() const noexcept { return enabled; }
+
+int InternalNode::receive() {
+    sockaddr_in client_addr{};
+    socklen_t   client_addr_len = sizeof(client_addr);
+    return accept4(tcps->get_socket().get(), (struct sockaddr*)&client_addr,
+                   &client_addr_len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+}

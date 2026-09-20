@@ -19,18 +19,11 @@ TCP_Server::TCP_Server(const std::string& m_addr, uint16_t port, Logger& logger)
         throw std::runtime_error("failed to set sock opt");
 }
 
-bool TCP_Server::make_bind() {
-    return bind(m_socket->get(), (struct sockaddr*)&s_addr, sizeof(s_addr)) ==
+bool TCP_Server::bind() {
+    return ::bind(m_socket->get(), (struct sockaddr*)&s_addr, sizeof(s_addr)) ==
            0;
 }
 
-bool TCP_Server::listening() { return listen(m_socket->get(), SOMAXCONN) == 0; }
+bool TCP_Server::listen() { return ::listen(m_socket->get(), SOMAXCONN) == 0; }
 
-int TCP_Server::receive() {
-    sockaddr_in client_addr;
-    socklen_t   client_addr_len = sizeof(client_addr);
-    return accept4(m_socket->get(), (struct sockaddr*)&client_addr,
-                   &client_addr_len, SOCK_NONBLOCK | SOCK_CLOEXEC);
-}
-
-Socket& TCP_Server::get_socket() const { return *m_socket; }
+Socket& TCP_Server::get_socket() const noexcept { return *m_socket; }

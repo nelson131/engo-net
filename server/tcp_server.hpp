@@ -9,12 +9,10 @@ class TCP_Server {
    public:
     TCP_Server(const std::string& m_addr, uint16_t port, Logger& logger);
 
-    bool make_bind();
-    bool listening();
+    bool bind();
+    bool listen();
 
-    int receive();
-
-    Socket& get_socket() const;
+    Socket& get_socket() const noexcept;
 
    private:
     Logger& logger;
