@@ -10,9 +10,13 @@ TCP_Server::TCP_Server(const std::string& m_addr, uint16_t port, Logger& logger)
     s_addr.sin_addr.s_addr = inet_addr(m_addr.c_str());
     s_addr.sin_port = htons(port);
 
-    m_socket->make_non_blocking();
+    if (!m_socket->make_non_blocking())
+        throw std::runtime_error("failed to make server socket non blocking");
 
-    setsockopt(m_socket->get(), SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    int opt = 1;
+    if (setsockopt(m_socket->get(), SOL_SOCKET, SO_REUSEADDR, &opt,
+                   sizeof(opt)) == -1)
+        throw std::runtime_error("failed to set sock opt");
 }
 
 bool TCP_Server::make_bind() {

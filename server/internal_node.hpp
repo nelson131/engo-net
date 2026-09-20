@@ -13,7 +13,7 @@
 
 class InternalNode {
    public:
-    InternalNode(const std::string& m_addr, uint64_t port, Logger& logger);
+    InternalNode(const std::string& m_addr, uint16_t port, Logger& logger);
     ~InternalNode();
 
     void run();
@@ -26,7 +26,6 @@ class InternalNode {
     std::unique_ptr<TCP_Server> tcps;
 
     int                      epoll_fd;
-    epoll_event              event;
     std::vector<epoll_event> events;
 
     std::unordered_set<int> clients;

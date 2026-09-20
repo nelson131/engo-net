@@ -22,7 +22,6 @@ class TCP_Server {
     const std::string m_addr;
     const uint16_t    port;
     sockaddr_in       s_addr;
-    int               opt;
 
     std::unique_ptr<Socket> m_socket;
 };
