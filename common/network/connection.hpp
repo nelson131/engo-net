@@ -1,11 +1,12 @@
 #pragma once
 
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #include <cstdint>
 #include <vector>
 
-#include "io_result.hpp"
+#include "packet.hpp"
 
 #define DEF_BUF_SIZE 1024
 
@@ -22,8 +23,8 @@ class Connection {
     Connection(Connection&& other) noexcept;
     Connection& operator=(Connection&& other) noexcept;
 
-    IOResult send();
-    IOResult recv();
+    bool send(const engo::Packet& packet);
+    bool recv();
 
     int  get_socket() const noexcept;
     bool is_closed() const noexcept;
@@ -31,7 +32,6 @@ class Connection {
    private:
     int m_socket;
 
-    std::vector<uint8_t> send_buf;
     std::vector<uint8_t> recv_buf;
 
     bool closed;

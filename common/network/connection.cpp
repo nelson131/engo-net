@@ -4,10 +4,7 @@
 
 #include <cerrno>
 
-#include "io_result.hpp"
-
 Connection::Connection(int m_socket) : m_socket(m_socket), closed(0) {
-    send_buf.resize(DEF_BUF_SIZE);
     recv_buf.resize(DEF_BUF_SIZE);
 }
 
@@ -25,7 +22,6 @@ void Connection::close() noexcept {
 Connection::Connection(Connection&& other) noexcept
     : m_socket(other.m_socket),
       recv_buf(std::move(other.recv_buf)),
-      send_buf(std::move(other.send_buf)),
       closed(other.closed) {
     other.m_socket = -1;
     other.closed = 1;
@@ -38,7 +34,6 @@ Connection& Connection::operator=(Connection&& other) noexcept {
 
     m_socket = other.m_socket;
     recv_buf = std::move(other.recv_buf);
-    send_buf = std::move(other.send_buf);
     closed = other.closed;
 
     other.m_socket = -1;
@@ -47,26 +42,34 @@ Connection& Connection::operator=(Connection&& other) noexcept {
     return *this;
 }
 
-IOResult Connection::send() {}
+bool Connection::send(const engo::Packet& packet) {
+    engo::Packet send_packet = packet;
+    send_packet.header.type = htons(packet.header.type);
+    send_packet.header.payload_size = htons(packet.header.payload_size);
 
-IOResult Connection::recv() {
-    while (1) {
-        ssize_t val = ::recv(m_socket, recv_buf.data(), recv_buf.size(), 0);
-        if (val > 0) return IOResult::SUCCESS;
-        if (val == 0) {
-            close();
-            return IOResult::CLOSED;
+    size_t total_size = sizeof(engo::PacketHeader) + packet.header.payload_size;
+    size_t sent = 0;
+
+    while (sent < total_size) {
+        ssize_t val = ::send(m_socket, send_packet.data.data() + sent,
+                             total_size - sent, 0);
+
+        if (val < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) continue;
+            return 0;
         }
 
-        if (errno == EINTR) continue;
-
-        if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return IOResult::WOULDBLOCK;
-        }
-
-        close();
-        return IOResult::ERROR;
+        sent += val;
     }
+}
+
+bool Connection::recv() {
+    char    temp[4096];
+    ssize_t val = ::recv(m_socket, temp, sizeof(temp), 0);
+    if (val <= 0) return 0;
+
+    recv_buf.insert(recv_buf.end(), temp, temp + val);
+    return 1;
 }
 
 int Connection::get_socket() const noexcept { return m_socket; }
