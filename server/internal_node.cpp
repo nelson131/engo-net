@@ -34,8 +34,8 @@ InternalNode::InternalNode(const std::string& m_addr, uint16_t port,
 }
 
 InternalNode::~InternalNode() {
-    for (int fd : clients) {
-        close(fd);
+    for (auto& it : clients) {
+        close(it.first);
     }
 
     if (epoll_fd >= 0) {
@@ -76,7 +76,7 @@ void InternalNode::run() {
                         continue;
                     }
 
-                    clients.emplace(client_fd);
+                    clients.emplace(client_fd, Connection(client_fd));
                 }
             } else {
                 // TODO recv

@@ -3,10 +3,11 @@
 #include <sys/epoll.h>
 
 #include <memory>
-#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 #include "../common/logger.hpp"
+#include "../common/network/connection.hpp"
 #include "tcp_server.hpp"
 
 #define MAX_EVENTS 64
@@ -28,7 +29,7 @@ class InternalNode {
     int                      epoll_fd;
     std::vector<epoll_event> events;
 
-    std::unordered_set<int> clients;
+    std::unordered_map<int, Connection> clients;
 
     bool enabled;
 
