@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "packet.hpp"
+#include "packet_framer.hpp"
 
 #define DEF_BUF_SIZE 1024
 
@@ -26,6 +27,8 @@ class Connection {
     bool send(const engo::Packet& packet);
     bool recv();
 
+    std::unique_ptr<engo::Packet> get_ready_packet();
+
     int  get_socket() const noexcept;
     bool is_closed() const noexcept;
 
@@ -33,6 +36,8 @@ class Connection {
     int m_socket;
 
     std::vector<uint8_t> recv_buf;
+
+    PacketFramer packet_framer;
 
     bool closed;
 };

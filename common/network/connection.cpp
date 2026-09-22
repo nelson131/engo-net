@@ -61,6 +61,8 @@ bool Connection::send(const engo::Packet& packet) {
 
         sent += val;
     }
+
+    return 1;
 }
 
 bool Connection::recv() {
@@ -70,6 +72,10 @@ bool Connection::recv() {
 
     recv_buf.insert(recv_buf.end(), temp, temp + val);
     return 1;
+}
+
+std::unique_ptr<engo::Packet> Connection::get_ready_packet() {
+    return packet_framer.pop_queue();
 }
 
 int Connection::get_socket() const noexcept { return m_socket; }
