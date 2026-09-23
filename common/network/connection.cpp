@@ -66,12 +66,26 @@ bool Connection::send(const engo::Packet& packet) {
 }
 
 bool Connection::recv() {
-    char    temp[4096];
-    ssize_t val = ::recv(m_socket, temp, sizeof(temp), 0);
-    if (val <= 0) return 0;
+    char temp[4096];
+    while (1) {
+        ssize_t val = ::recv(m_socket, temp, sizeof(temp), 0);
+        if (val > 0) {
+            recv_buf.insert(recv_buf.end(), temp, temp + val);
+            packet_framer.parse_raw(recv_buf);
+            continue;
+        }
 
-    recv_buf.insert(recv_buf.end(), temp, temp + val);
-    return 1;
+        if (val == 0) {
+            close();
+            return 0;
+        }
+
+        if (errno == EINTR) continue;
+        if (errno == EAGAIN || errno == EWOULDBLOCK) return 1;
+
+        close();
+        return 0;
+    }
 }
 
 std::unique_ptr<engo::Packet> Connection::get_ready_packet() {

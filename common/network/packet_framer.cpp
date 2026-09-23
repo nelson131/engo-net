@@ -5,9 +5,6 @@
 PacketFramer::PacketFramer() : queue() {}
 
 void PacketFramer::parse_raw(std::vector<uint8_t>& buf) {
-    std::unique_ptr<engo::Packet> fresh_packet =
-        std::make_unique<engo::Packet>();
-
     while (buf.size() >= sizeof(engo::PacketHeader)) {
         engo::PacketHeader* header =
             reinterpret_cast<engo::PacketHeader*>(buf.data());
@@ -17,6 +14,9 @@ void PacketFramer::parse_raw(std::vector<uint8_t>& buf) {
 
         if (buf.size() < packet_size) break;
 
+        std::unique_ptr<engo::Packet> fresh_packet =
+            std::make_unique<engo::Packet>();
+
         fresh_packet->header.type = ntohs(header->type);
         fresh_packet->header.payload_size = payload_size;
 
@@ -24,13 +24,14 @@ void PacketFramer::parse_raw(std::vector<uint8_t>& buf) {
         std::copy(buf.begin(), buf.begin() + packet_size,
                   fresh_packet->data.begin());
 
+        queue.push(fresh_packet);
+
         buf.erase(buf.begin(), buf.begin() + packet_size);
     }
-
-    queue.push(fresh_packet);
 }
 
 std::unique_ptr<engo::Packet> PacketFramer::pop_queue() {
+    if (queue.empty()) return nullptr;
     std::unique_ptr<engo::Packet> p = std::move(queue.front());
     queue.pop();
     return p;

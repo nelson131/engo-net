@@ -35,4 +35,10 @@ class InternalNode {
 
    private:
     int receive();
+
+    template <typename T>
+    void client_disconnect(int& fd, T it) {
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, nullptr);
+        clients.erase(it);
+    }
 };

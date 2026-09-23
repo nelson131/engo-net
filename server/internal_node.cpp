@@ -79,7 +79,26 @@ void InternalNode::run() {
                     clients.emplace(client_fd, Connection(client_fd));
                 }
             } else {
-                // TODO recv
+                int& fd = events[i].data.fd;
+                auto it = clients.find(fd);
+                if (it == clients.end()) continue;
+
+                Connection& connection = it->second;
+
+                if (events[i].events & (EPOLLERR | EPOLLHUP | EPOLLRDHUP)) {
+                    client_disconnect(fd, it);
+                    continue;
+                }
+
+                if (events[i].events & EPOLLIN) {
+                    if (!connection.recv()) {
+                        client_disconnect(fd, it);
+                    }
+
+                    while (auto packet = connection.get_ready_packet()) {
+                        // TODO ready packet lol
+                    }
+                }
             }
         }
     }
