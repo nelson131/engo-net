@@ -12,7 +12,15 @@ class EngoNet {
 
     virtual void loop();
 
+    void quit() noexcept;
+
     bool is_running() const noexcept;
+
+   protected:
+    std::vector<std::string> get_args(const std::string& input) const;
+
+    Logger& get_logger() const noexcept;
+    Config& get_config() const noexcept;
 
    private:
     bool run;

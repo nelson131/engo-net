@@ -1,5 +1,3 @@
-#pragma once
-
 #include <string_view>
 
 #include "engo_client.hpp"

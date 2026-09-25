@@ -14,4 +14,22 @@ EngoNet::EngoNet() : run(1) {
 
 void EngoNet::loop() {}
 
+void EngoNet::quit() noexcept { run = 0; }
+
 bool EngoNet::is_running() const noexcept { return run; }
+
+std::vector<std::string> EngoNet::get_args(const std::string& input) const {
+    std::istringstream       stream(input);
+    std::string              arg;
+    std::vector<std::string> args;
+
+    while (stream >> arg) {
+        args.push_back(arg);
+    }
+
+    return args;
+}
+
+Logger& EngoNet::get_logger() const noexcept { return *logger; }
+
+Config& EngoNet::get_config() const noexcept { return *config; }

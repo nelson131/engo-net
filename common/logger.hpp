@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <mutex>
 #include <sstream>
+#include <vector>
 
 class Logger {
    public:
@@ -36,5 +37,5 @@ class Logger {
     std::ofstream file;
     std::mutex    mutex;
 
-    const char* type_msgs[];
+    std::vector<std::string> type_msgs;
 };

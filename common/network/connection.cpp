@@ -119,7 +119,7 @@ void Connection::parse_raw(std::vector<uint8_t>& buf) {
         std::copy(buf.begin(), buf.begin() + packet_size,
                   fresh_packet->data.begin());
 
-        packet_queue.push(fresh_packet);
+        packet_queue.push(std::move(fresh_packet));
 
         buf.erase(buf.begin(), buf.begin() + packet_size);
     }

@@ -79,7 +79,7 @@ void InternalNode::run() {
                     clients.emplace(client_fd, Connection(client_fd));
                 }
             } else {
-                int& fd = events[i].data.fd;
+                int  fd = events[i].data.fd;
                 auto it = clients.find(fd);
                 if (it == clients.end()) continue;
 
@@ -103,6 +103,8 @@ void InternalNode::run() {
         }
     }
 }
+
+void InternalNode::stop() noexcept { enabled = 0; }
 
 bool InternalNode::is_enabled() const noexcept { return enabled; }
 

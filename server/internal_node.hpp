@@ -18,6 +18,7 @@ class InternalNode {
     ~InternalNode();
 
     void run();
+    void stop() noexcept;
 
     bool is_enabled() const noexcept;
 
