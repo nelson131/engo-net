@@ -14,7 +14,6 @@ class EngoServer : public EngoNet {
 
    private:
     std::unique_ptr<InternalNode> internal_node;
-    std::thread                   network_thread;
 
    private:
     void stop();

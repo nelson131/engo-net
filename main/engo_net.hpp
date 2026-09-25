@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <thread>
 
 #include "../common/config.hpp"
 #include "../common/file_handling/filesystem.hpp"
@@ -15,6 +16,9 @@ class EngoNet {
     void quit() noexcept;
 
     bool is_running() const noexcept;
+
+   protected:
+    std::thread network_thread;
 
    protected:
     std::vector<std::string> get_args(const std::string& input) const;

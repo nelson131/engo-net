@@ -101,6 +101,7 @@ void InternalNode::run() {
 
                     while (auto packet = connection.get_ready_packet()) {
                         // TODO ready packet lol
+                        connection.send(*packet);
                     }
                 }
             }

@@ -11,6 +11,8 @@ class TCP_Client {
 
     bool connect();
 
+    Socket& get_socket() const noexcept;
+
    private:
     Logger& logger;
 

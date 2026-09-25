@@ -15,3 +15,5 @@ bool TCP_Client::connect() {
     return ::connect(m_socket->get(), (struct sockaddr*)&s_addr,
                      sizeof(s_addr)) == 0;
 }
+
+Socket& TCP_Client::get_socket() const noexcept { return *m_socket; }

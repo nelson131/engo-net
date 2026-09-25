@@ -10,9 +10,11 @@ add_executable(engo-net
     server/tcp_server.cpp
     server/internal_node.cpp
     client/tcp_client.cpp
+    client/user.cpp
     common/logger.cpp
     common/network/connection.cpp
     common/network/socket.cpp
+    common/network/packet.cpp
     common/file_handling/filesystem.cpp
     common/file_handling/formed_file.cpp
 )
