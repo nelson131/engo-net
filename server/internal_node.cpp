@@ -110,7 +110,10 @@ void InternalNode::run() {
                                   << std::string(packet->data.begin(),
                                                  packet->data.end())
                                   << std::endl;
-                        connection.send(*packet);
+                        if (!connection.send(*packet)) {
+                            std::cout << "failed to send the packet from server"
+                                      << std::endl;
+                        }
                     }
                 }
             }

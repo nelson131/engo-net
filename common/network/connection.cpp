@@ -4,6 +4,7 @@
 
 #include <cerrno>
 #include <cstdint>
+#include <iostream>
 
 Connection::Connection(int m_socket) : m_socket(m_socket), closed(0) {
     recv_buf.reserve(DEF_BUF_SIZE);

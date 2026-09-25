@@ -11,6 +11,7 @@ User::User(const std::string& addr, uint16_t port, Logger& logger)
         attempts++;
     }
 
+    tcpc.get_socket().make_non_blocking();
     connection = std::make_unique<Connection>(tcpc.get_socket().get());
 }
 
@@ -22,12 +23,12 @@ void User::run() {
         }
 
         while (auto packet = connection->get_ready_packet()) {
-            // TODO quite lloooool asf
-            std::cout << "received a packet: " << std::endl;
-            std::cout << "type: " << packet->header.type << std::endl;
+            std::cout << "GOT PACKET!\n";
+
+            std::cout << "type: " << packet->header.type << '\n';
             std::cout << "data: "
                       << std::string(packet->data.begin(), packet->data.end())
-                      << std::endl;
+                      << '\n';
         }
     }
 }
