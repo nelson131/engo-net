@@ -9,7 +9,7 @@ class TCP_Client {
    public:
     TCP_Client(const std::string& m_addr, uint16_t port, Logger& logger);
 
-    bool conn();
+    bool connect();
 
    private:
     Logger& logger;

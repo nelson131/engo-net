@@ -45,12 +45,15 @@ InternalNode::~InternalNode() {
 
 void InternalNode::run() {
     while (enabled) {
-        int num_events = epoll_wait(epoll_fd, events.data(), MAX_EVENTS, -1);
+        int num_events =
+            epoll_wait(epoll_fd, events.data(), MAX_EVENTS, EPOLL_TIMEOUT);
         if (num_events == -1) {
             enabled = 0;
             logger.log(Logger::ERROR,
                        "failed to wait for events in the internal node");
         }
+
+        if (num_events == 0) continue;
 
         for (size_t i = 0; i < num_events; i++) {
             if (events[i].data.fd == tcps->get_socket().get()) {
@@ -93,6 +96,7 @@ void InternalNode::run() {
                 if (events[i].events & EPOLLIN) {
                     if (!connection.recv()) {
                         client_disconnect(fd, it);
+                        continue;
                     }
 
                     while (auto packet = connection.get_ready_packet()) {

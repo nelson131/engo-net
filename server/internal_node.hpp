@@ -11,6 +11,7 @@
 #include "tcp_server.hpp"
 
 #define MAX_EVENTS 64
+#define EPOLL_TIMEOUT 100
 
 class InternalNode {
    public:

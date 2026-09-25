@@ -12,10 +12,12 @@ void EngoServer::loop() {
         std::getline(std::cin, cmd);
         std::vector<std::string> args = get_args(cmd);
 
+        if (args.empty()) continue;
+
         if (args[0] == "exit") {
             stop();
             quit();
-        } else if (args[0] == "start") {
+        } else if (args[0] == "start" && args.size() == 3) {
             if (!internal_node) {
                 internal_node = std::make_unique<InternalNode>(
                     args[1], static_cast<uint16_t>(std::stoul(args[2])),

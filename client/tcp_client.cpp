@@ -11,7 +11,7 @@ TCP_Client::TCP_Client(const std::string& m_addr, uint16_t port, Logger& logger)
     s_addr.sin_port = htons(port);
 }
 
-bool TCP_Client::conn() {
-    return connect(m_socket->get(), (struct sockaddr*)&s_addr,
-                   sizeof(s_addr)) == 0;
+bool TCP_Client::connect() {
+    return ::connect(m_socket->get(), (struct sockaddr*)&s_addr,
+                     sizeof(s_addr)) == 0;
 }
