@@ -44,6 +44,8 @@ void EngoClient::loop() {
             }
         }
     }
+
+    if (network_thread.joinable()) network_thread.join();
 }
 
 void EngoClient::stop() {

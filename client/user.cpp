@@ -3,7 +3,7 @@
 #include <iostream>
 
 User::User(const std::string& addr, uint16_t port, Logger& logger)
-    : logger(logger), tcpc(addr, port, logger) {
+    : logger(logger), tcpc(addr, port, logger), enabled(1) {
     size_t attempts = 0;
     while (!tcpc.connect()) {
         if (attempts >= 5)
@@ -45,7 +45,7 @@ bool User::send(const std::vector<std::string>& message, size_t arg) {
     if (arg >= message.size()) return 0;
 
     std::string msg = "";
-    for (size_t i = 0; i < message.size(); i++) {
+    for (size_t i = arg; i < message.size(); i++) {
         if (i > 1) msg += " ";
 
         msg += message[i];

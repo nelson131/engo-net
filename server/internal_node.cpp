@@ -2,6 +2,8 @@
 
 #include <sys/epoll.h>
 
+#include <iostream>
+
 InternalNode::InternalNode(const std::string& m_addr, uint16_t port,
                            Logger& logger)
     : tcps(std::make_unique<TCP_Server>(m_addr, port, logger)),
@@ -101,6 +103,13 @@ void InternalNode::run() {
 
                     while (auto packet = connection.get_ready_packet()) {
                         // TODO ready packet lol
+                        std::cout << "received a packet: " << std::endl;
+                        std::cout << "type: " << packet->header.type
+                                  << std::endl;
+                        std::cout << "data: "
+                                  << std::string(packet->data.begin(),
+                                                 packet->data.end())
+                                  << std::endl;
                         connection.send(*packet);
                     }
                 }

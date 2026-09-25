@@ -3,9 +3,10 @@
 #include <sys/socket.h>
 
 #include <cerrno>
+#include <cstdint>
 
 Connection::Connection(int m_socket) : m_socket(m_socket), closed(0) {
-    recv_buf.resize(DEF_BUF_SIZE);
+    recv_buf.reserve(DEF_BUF_SIZE);
 }
 
 Connection::~Connection() { close(); }
@@ -43,16 +44,24 @@ Connection& Connection::operator=(Connection&& other) noexcept {
 }
 
 bool Connection::send(const engo::Packet& packet) {
-    engo::Packet send_packet = packet;
-    send_packet.header.type = htons(packet.header.type);
-    send_packet.header.payload_size = htons(packet.header.payload_size);
+    engo::PacketHeader header{htons(packet.header.type),
+                              htons(packet.header.payload_size)};
 
-    size_t total_size = sizeof(engo::PacketHeader) + packet.header.payload_size;
+    size_t total_size = sizeof(engo::PacketHeader) + packet.data.size();
+
+    std::vector<uint8_t> raw(total_size);
+    std::copy(
+        reinterpret_cast<const uint8_t*>(&header),
+        reinterpret_cast<const uint8_t*>(&header) + sizeof(engo::PacketHeader),
+        raw.begin());
+
+    std::copy(packet.data.begin(), packet.data.end(),
+              raw.begin() + sizeof(engo::PacketHeader));
+
     size_t sent = 0;
 
     while (sent < total_size) {
-        ssize_t val = ::send(m_socket, send_packet.data.data() + sent,
-                             total_size - sent, 0);
+        ssize_t val = ::send(m_socket, raw.data() + sent, raw.size() - sent, 0);
 
         if (val < 0) {
             if (errno == EAGAIN || errno == EWOULDBLOCK) continue;
@@ -115,9 +124,8 @@ void Connection::parse_raw(std::vector<uint8_t>& buf) {
         fresh_packet->header.type = ntohs(header->type);
         fresh_packet->header.payload_size = payload_size;
 
-        fresh_packet->data.resize(packet_size);
-        std::copy(buf.begin(), buf.begin() + packet_size,
-                  fresh_packet->data.begin());
+        fresh_packet->data.assign(buf.begin() + sizeof(engo::PacketHeader),
+                                  buf.begin() + packet_size);
 
         packet_queue.push(std::move(fresh_packet));
 
