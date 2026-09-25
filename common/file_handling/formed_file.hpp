@@ -17,7 +17,8 @@ class FormedFile : public File {
 
    private:
     typedef std::unordered_map<std::string, std::string> line;
-    std::unordered_map<std::string, line>                content;
+
+    std::unordered_map<std::string, line> content;
 };
 
 }  // namespace engo
