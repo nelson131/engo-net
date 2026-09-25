@@ -5,7 +5,8 @@
 EngoClient::EngoClient() : EngoNet() {}
 
 void EngoClient::loop() {
-    while (1) {
+    while (is_running()) {
+        std::cout << ">";
         std::string cmd = "";
         std::getline(std::cin, cmd);
         std::vector<std::string> args = get_args(cmd);
