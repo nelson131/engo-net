@@ -4,10 +4,11 @@
 #include <unistd.h>
 
 #include <cstdint>
+#include <memory>
+#include <queue>
 #include <vector>
 
 #include "packet.hpp"
-#include "packet_framer.hpp"
 
 #define DEF_BUF_SIZE 1024
 
@@ -37,7 +38,10 @@ class Connection {
 
     std::vector<uint8_t> recv_buf;
 
-    PacketFramer packet_framer;
+    std::queue<std::unique_ptr<engo::Packet>> packet_queue;
 
     bool closed;
+
+   private:
+    void parse_raw(std::vector<uint8_t>& buf);
 };

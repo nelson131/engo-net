@@ -5,4 +5,6 @@
 class EngoServer : public EngoNet {
    public:
     EngoServer();
+
+    void loop() override;
 };

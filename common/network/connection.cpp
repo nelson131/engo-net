@@ -71,7 +71,7 @@ bool Connection::recv() {
         ssize_t val = ::recv(m_socket, temp, sizeof(temp), 0);
         if (val > 0) {
             recv_buf.insert(recv_buf.end(), temp, temp + val);
-            packet_framer.parse_raw(recv_buf);
+            parse_raw(recv_buf);
             continue;
         }
 
@@ -89,9 +89,38 @@ bool Connection::recv() {
 }
 
 std::unique_ptr<engo::Packet> Connection::get_ready_packet() {
-    return packet_framer.pop_queue();
+    if (packet_queue.empty()) return nullptr;
+    std::unique_ptr<engo::Packet> p = std::move(packet_queue.front());
+    packet_queue.pop();
+    return p;
 }
 
 int Connection::get_socket() const noexcept { return m_socket; }
 
 bool Connection::is_closed() const noexcept { return closed; }
+
+void Connection::parse_raw(std::vector<uint8_t>& buf) {
+    while (buf.size() >= sizeof(engo::PacketHeader)) {
+        engo::PacketHeader* header =
+            reinterpret_cast<engo::PacketHeader*>(buf.data());
+
+        uint16_t payload_size = ntohs(header->payload_size);
+        size_t   packet_size = payload_size + sizeof(engo::PacketHeader);
+
+        if (buf.size() < packet_size) break;
+
+        std::unique_ptr<engo::Packet> fresh_packet =
+            std::make_unique<engo::Packet>();
+
+        fresh_packet->header.type = ntohs(header->type);
+        fresh_packet->header.payload_size = payload_size;
+
+        fresh_packet->data.resize(packet_size);
+        std::copy(buf.begin(), buf.begin() + packet_size,
+                  fresh_packet->data.begin());
+
+        packet_queue.push(fresh_packet);
+
+        buf.erase(buf.begin(), buf.begin() + packet_size);
+    }
+}

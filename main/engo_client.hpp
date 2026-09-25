@@ -5,4 +5,6 @@
 class EngoClient : public EngoNet {
    public:
     EngoClient();
+
+    void loop() override;
 };

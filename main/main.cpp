@@ -12,14 +12,12 @@ int main(int argc, char* argv[]) {
 
     if (mode == "client") {
         EngoClient engo_client{};
-        while (engo_client.is_running()) {
-        }
+        engo_client.loop();
     }
 
     if (mode == "server") {
         EngoServer engo_server{};
-        while (engo_server.is_running()) {
-        }
+        engo_server.loop();
     }
 
     return 0;
