@@ -1,40 +1,13 @@
 #include "engo_server.hpp"
 
-#include <iostream>
-#include <vector>
-
-EngoServer::EngoServer() : EngoNet() {}
+EngoServer::EngoServer(size_t wcols, size_t wrows)
+    : EngoNet(),
+      tui(engo::Pair<size_t, size_t>{wcols, wrows}, state, get_config()) {}
 
 void EngoServer::loop() {
-    std::string cmd = "";
     while (is_running()) {
-        std::cout << "> ";
-        std::getline(std::cin, cmd);
-        std::vector<std::string> args = get_args(cmd);
-
-        if (args.empty()) continue;
-
-        if (args[0] == "exit") {
-            stop();
-            quit();
-        } else if (args[0] == "start" && args.size() == 3) {
-            if (!internal_node) {
-                internal_node = std::make_unique<InternalNode>(
-                    args[1], static_cast<uint16_t>(std::stoul(args[2])),
-                    get_logger());
-
-                network_thread = std::thread([this] { internal_node->run(); });
-
-                std::cout << "server started on: " << args[1] << ", port: "
-                          << static_cast<uint16_t>(std::stoul(args[2]))
-                          << std::endl;
-            }
-        } else if (args[0] == "stop") {
-            stop();
-        }
+        tui.render();
     }
-
-    if (network_thread.joinable()) network_thread.join();
 }
 
 void EngoServer::stop() {

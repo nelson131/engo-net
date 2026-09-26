@@ -5,8 +5,9 @@
 #include <iostream>
 
 InternalNode::InternalNode(const std::string& m_addr, uint16_t port,
-                           Logger& logger)
+                           ServerState& state, Logger& logger)
     : tcps(std::make_unique<TCP_Server>(m_addr, port, logger)),
+      state(state),
       logger(logger),
       epoll_fd(-1),
       events(),
@@ -32,6 +33,10 @@ InternalNode::InternalNode(const std::string& m_addr, uint16_t port,
 
     events.resize(MAX_EVENTS);
 
+    state.status = RUNNING;
+    state.addr = m_addr;
+    state.port = port;
+
     logger.log(Logger::INFO, "internal node started on: " + msg);
 }
 
@@ -43,6 +48,8 @@ InternalNode::~InternalNode() {
     if (epoll_fd >= 0) {
         close(epoll_fd);
     }
+
+    state.status = STOPPED;
 }
 
 void InternalNode::run() {
@@ -60,7 +67,7 @@ void InternalNode::run() {
         for (size_t i = 0; i < num_events; i++) {
             if (events[i].data.fd == tcps->get_socket().get()) {
                 while (1) {
-                    int client_fd = receive();
+                    int client_fd = receive(state);
                     if (client_fd == -1) {
                         if (errno == EAGAIN || errno == EWOULDBLOCK) break;
                         if (errno == EINTR) continue;
@@ -125,9 +132,20 @@ void InternalNode::stop() noexcept { enabled = 0; }
 
 bool InternalNode::is_enabled() const noexcept { return enabled; }
 
-int InternalNode::receive() {
+int InternalNode::receive(ServerState& state) {
     sockaddr_in client_addr{};
     socklen_t   client_addr_len = sizeof(client_addr);
-    return accept4(tcps->get_socket().get(), (struct sockaddr*)&client_addr,
-                   &client_addr_len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+    int         client_fd =
+        accept4(tcps->get_socket().get(), (struct sockaddr*)&client_addr,
+                &client_addr_len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+
+    if (client_fd != -1) {
+        std::string ip;
+        ip.reserve(INET_ADDRSTRLEN);
+        uint16_t port = ntohs(client_addr.sin_port);
+
+        state.clients.push_back(engo::Pair<std::string, uint16_t>{ip, port});
+    }
+
+    return client_fd;
 }

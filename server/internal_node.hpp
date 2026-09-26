@@ -8,6 +8,7 @@
 
 #include "../common/logger.hpp"
 #include "../common/network/connection.hpp"
+#include "server_state.hpp"
 #include "tcp_server.hpp"
 
 #define MAX_EVENTS 64
@@ -15,7 +16,8 @@
 
 class InternalNode {
    public:
-    InternalNode(const std::string& m_addr, uint16_t port, Logger& logger);
+    InternalNode(const std::string& m_addr, uint16_t port, ServerState& state,
+                 Logger& logger);
     ~InternalNode();
 
     void run();
@@ -24,7 +26,8 @@ class InternalNode {
     bool is_enabled() const noexcept;
 
    private:
-    Logger& logger;
+    ServerState& state;
+    Logger&      logger;
 
     std::unique_ptr<TCP_Server> tcps;
 
@@ -36,7 +39,7 @@ class InternalNode {
     bool enabled;
 
    private:
-    int receive();
+    int receive(ServerState& state);
 
     template <typename T>
     void client_disconnect(int& fd, T it) {

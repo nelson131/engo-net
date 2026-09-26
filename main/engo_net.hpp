@@ -19,6 +19,7 @@ class EngoNet {
 
    protected:
     std::thread network_thread;
+    std::thread tui_thread;
 
    protected:
     std::vector<std::string> get_args(const std::string& input) const;

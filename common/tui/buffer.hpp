@@ -43,13 +43,22 @@ class Buffer {
 
     void clear();
 
-    void put(engo::Pair<size_t, size_t> v, c32 c, i32 tg, i32 bg, u8 fl);
-    void put(engo::Pair<size_t, size_t> v, std::string_view text, i32 tg,
-             i32 bg, u8 fl);
+    void put(engo::Pair<size_t, size_t> v, c32 c, i32 tg = COLOR_DEFAULT,
+             i32 bg = COLOR_DEFAULT, u8 fl = STYLE_NONE);
+    void put(engo::Pair<size_t, size_t> v, std::string_view text,
+             i32 tg = COLOR_DEFAULT, i32 bg = COLOR_DEFAULT,
+             u8 fl = STYLE_NONE);
+
+    void putv(engo::Pair<size_t, size_t> v, std::string_view text,
+              i32 tg = COLOR_DEFAULT, i32 bg = COLOR_DEFAULT,
+              u8 fl = STYLE_NONE);
 
     void render();
 
     Cell& get_cell(engo::Pair<size_t, size_t> pos);
+
+    size_t get_wcols() const noexcept;
+    size_t get_wrows() const noexcept;
 
    private:
     size_t window_cols;

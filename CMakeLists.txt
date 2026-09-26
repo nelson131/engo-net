@@ -17,4 +17,9 @@ add_executable(engo-net
     common/network/packet.cpp
     common/file_handling/filesystem.cpp
     common/file_handling/formed_file.cpp
+    common/tui/buffer.cpp
+    common/tui/server_tui.cpp
+    common/tui/client_tui.cpp
+    common/tui/tui.cpp
+    common/tui/rect.cpp
 )

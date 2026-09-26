@@ -31,37 +31,52 @@ Cell& Buffer::get_cell(engo::Pair<size_t, size_t> pos) {
     return actual[to_index(pos)];
 }
 
-void Buffer::put(engo::Pair<size_t, size_t> pos, c32 c, i32 tg, i32 bg, u8 fl) {
-    if (pos.x >= window_cols || pos.y >= window_rows) return;
+void Buffer::put(engo::Pair<size_t, size_t> v, c32 c, i32 tg, i32 bg, u8 fl) {
+    if (v.x >= window_cols || v.y >= window_rows) return;
 
     size_t width = codepoint_width(c);
     if (width == 0) return;
 
-    if (pos.x + width > window_cols) return;
+    if (v.x + width > window_cols) return;
 
-    Cell& cell = get_cell(pos);
+    Cell& cell = get_cell(v);
     cell.c = c;
     cell.tg = tg;
     cell.bg = bg;
     cell.fl = fl;
 }
 
-void Buffer::put(engo::Pair<size_t, size_t> pos, std::string_view text, i32 tg,
+void Buffer::put(engo::Pair<size_t, size_t> v, std::string_view text, i32 tg,
                  i32 bg, u8 fl) {
     size_t offset = 0;
 
     while (offset < text.size()) {
         c32 c;
-        if (!utf8_decode(text, offset, c)) {
-            return;
-        }
+        if (!utf8_decode(text, offset, c)) return;
 
         size_t width = codepoint_width(c);
         if (width == 0) continue;
 
-        if (pos.x + width > window_cols) break;
-        put(pos, c, tg, bg, fl);
-        pos.x += width;
+        if (v.x + width > window_cols) break;
+        put(v, c, tg, bg, fl);
+        v.x += width;
+    }
+}
+
+void Buffer::putv(engo::Pair<size_t, size_t> v, std::string_view text, i32 tg,
+                  i32 bg, u8 fl) {
+    size_t offset = 0;
+
+    while (offset < text.size()) {
+        c32 c;
+        if (!utf8_decode(text, offset, c)) return;
+
+        size_t width = codepoint_width(c);
+        if (width == 0) continue;
+
+        if (v.x + width > window_cols) break;
+        put(v, c, tg, bg, fl);
+        v.y++;
     }
 }
 
@@ -222,3 +237,7 @@ void Buffer::render() {
     old = actual;
     std::cout.flush();
 }
+
+size_t Buffer::get_wcols() const noexcept { return window_cols; }
+
+size_t Buffer::get_wrows() const noexcept { return window_rows; }
