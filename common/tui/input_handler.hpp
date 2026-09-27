@@ -7,6 +7,9 @@ class InputHandler {
     enum Key {
         NONE = -1,
         ESC = 27,
+        BACKSPACE = 127,
+        ENTER1 = '\n',
+        ENTER2 = '\r',
         ARROW_UP = 1000,
         ARROW_DOWN,
         ARROW_LEFT,

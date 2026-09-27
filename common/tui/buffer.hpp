@@ -42,6 +42,8 @@ class Buffer {
     Buffer(size_t window_cols, size_t window_rows);
 
     void clear();
+    void clear_square(const engo::Pair<size_t, size_t>& v,
+                      const engo::Pair<size_t, size_t>& size);
 
     void put(engo::Pair<size_t, size_t> v, c32 c, i32 tg = COLOR_DEFAULT,
              i32 bg = COLOR_DEFAULT, u8 fl = STYLE_NONE);

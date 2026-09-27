@@ -27,6 +27,17 @@ void Buffer::clear() {
     }
 }
 
+void Buffer::clear_square(const engo::Pair<size_t, size_t>& v,
+                          const engo::Pair<size_t, size_t>& size) {
+    if (v.x + size.x >= window_cols || v.y + size.y >= window_rows) return;
+
+    for (size_t y = v.y; y < size.y; y++) {
+        for (size_t x = v.x; x < size.x; x++) {
+            cell_reset(actual[to_index({x, y})]);
+        }
+    }
+}
+
 Cell& Buffer::get_cell(engo::Pair<size_t, size_t> pos) {
     return actual[to_index(pos)];
 }

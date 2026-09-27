@@ -10,6 +10,7 @@ class Console {
     Console(const Rect& rect);
 
     void draw(Buffer& buf);
+    void sumbit_input();
 
     const Rect& get_rect() const noexcept;
     void        change_rect(const Rect& rect) noexcept;

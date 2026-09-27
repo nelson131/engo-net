@@ -17,6 +17,14 @@ void Console::draw(Buffer& buf) {
     buf.put(engo::Pair<size_t, size_t>(x, y), "> " + text_input.get_current());
 }
 
+void Console::sumbit_input() {
+    message_list.add(
+        {"admin", text_input.get_current(), std::chrono::system_clock::now()});
+
+    text_input.clear();
+    message_list.scroll_down();
+}
+
 const Rect& Console::get_rect() const noexcept { return rect; }
 
 void Console::change_rect(const Rect& rect) noexcept { this->rect = rect; }
