@@ -17,9 +17,6 @@ class EngoNet {
 
     void quit() noexcept;
 
-    void enable_raw_mode();
-    void disable_raw_mode();
-
     bool is_running() const noexcept;
 
    protected:

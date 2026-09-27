@@ -1,5 +1,7 @@
 #pragma once
 
+#include <termios.h>
+
 class InputHandler {
    public:
     enum Key {
@@ -13,10 +15,16 @@ class InputHandler {
 
    public:
     InputHandler();
+    ~InputHandler();
 
     int pause();
     int poll();
 
    private:
+    termios old_term{};
+    int     old_flags = -1;
+
+    void enable_raw_mode();
+
     int read_escape_sequence();
 };

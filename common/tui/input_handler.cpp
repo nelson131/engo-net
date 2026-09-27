@@ -3,7 +3,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-InputHandler::InputHandler() {}
+InputHandler::InputHandler() { enable_raw_mode(); }
+
+InputHandler::~InputHandler() {
+    if (old_flags >= 0) fcntl(STDIN_FILENO, F_SETFL, old_flags);
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_term);
+}
 
 int InputHandler::pause() {
     char c;
@@ -14,15 +20,29 @@ int InputHandler::pause() {
 }
 
 int InputHandler::poll() {
-    int old_flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-    if (old_flags == -1) return NONE;
-    if (fcntl(STDIN_FILENO, F_SETFL, old_flags | O_NONBLOCK) == -1) return NONE;
+    char    c;
+    ssize_t n = ::read(STDIN_FILENO, &c, 1);
+    if (n != 1) return NONE;
+    if (c == '\033') return read_escape_sequence();
 
-    int result = pause();
+    return static_cast<unsigned char>(c);
+}
 
-    fcntl(STDIN_FILENO, F_SETFL, old_flags);
+void InputHandler::enable_raw_mode() {
+    tcgetattr(STDIN_FILENO, &old_term);
 
-    return result;
+    termios term = old_term;
+
+    term.c_lflag &= ~(ICANON | ECHO);
+    term.c_iflag &= ~(IXON | ICRNL);
+
+    term.c_cc[VMIN] = 0;
+    term.c_cc[VTIME] = 1;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+
+    old_flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, old_flags | O_NONBLOCK);
 }
 
 int InputHandler::read_escape_sequence() {

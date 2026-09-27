@@ -2,14 +2,9 @@
 
 EngoServer::EngoServer(size_t wcols, size_t wrows)
     : EngoNet(),
-      tui(engo::Pair<size_t, size_t>{wcols, wrows}, state, get_config()) {
-    enable_raw_mode();
-}
+      tui(engo::Pair<size_t, size_t>{wcols, wrows}, state, get_config()) {}
 
-EngoServer::~EngoServer() {
-    stop();
-    disable_raw_mode();
-}
+EngoServer::~EngoServer() { stop(); }
 
 void EngoServer::loop() {
     while (is_running()) {
@@ -20,6 +15,8 @@ void EngoServer::loop() {
 
 void EngoServer::handle_input() {
     int key = input_handler.poll();
+    if (key == InputHandler::NONE) return;
+
     if (key == 'q') {
         quit();
         return;
