@@ -12,6 +12,8 @@ class TextInput {
 
     void clear();
 
+    const std::string& get_current() const noexcept;
+
    private:
     std::string input;
 };

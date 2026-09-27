@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "../../server/server_state.hpp"
+#include "console.hpp"
 #include "rect.hpp"
 #include "tui.hpp"
 
@@ -22,4 +23,6 @@ class ServerTUI : public TUI {
 
     std::unique_ptr<Rect> rect;
     std::string           rect_floor;
+
+    std::unique_ptr<Console> console;
 };

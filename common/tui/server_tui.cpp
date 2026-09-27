@@ -11,6 +11,10 @@ ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
         engo::Pair<size_t, size_t>{rect_w, screen_meta.y - 6});
 
     rect_floor = std::string(rect->get_size().x - 2, '-');
+
+    console = std::make_unique<Console>(
+        Rect{{rect->get_vec().x + rect->get_size().x + 1, rect->get_vec().y},
+             {screen_meta.x - rect->get_size().x, screen_meta.y - 6}});
 }
 
 void ServerTUI::render() {
@@ -25,6 +29,7 @@ void ServerTUI::draw_state() {
     size_t x = 1;
     size_t y = 4;
 
+    // Server status >>>
     // 1 section: status, addr, port
     buf.put(engo::Pair<size_t, size_t>{x, y++},
             "state: " + std::string(state.status_msgs[state.status]));
@@ -46,6 +51,9 @@ void ServerTUI::draw_state() {
     y++;
     buf.put(engo::Pair<size_t, size_t>{x, y++}, rect_floor, COLOR_DEFAULT,
             COLOR_DEFAULT, STYLE_BOLD);
+
+    // Console >>
+    console->draw(buf);
 }
 
 void ServerTUI::make_header() {

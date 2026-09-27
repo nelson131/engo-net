@@ -13,3 +13,5 @@ void TextInput::clear() {
         input.clear();
     }
 }
+
+const std::string& TextInput::get_current() const noexcept { return input; }
