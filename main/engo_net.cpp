@@ -1,5 +1,8 @@
 #include "engo_net.hpp"
 
+#include <termios.h>
+#include <unistd.h>
+
 EngoNet::EngoNet() : run(1) {
     engo::filesystem::init();
 
@@ -14,7 +17,29 @@ EngoNet::EngoNet() : run(1) {
 
 void EngoNet::loop() {}
 
+void EngoNet::handle_input() {}
+
 void EngoNet::quit() noexcept { run = 0; }
+
+void EngoNet::enable_raw_mode() {
+    struct termios term;
+    tcgetattr(STDIN_FILENO, &term);
+
+    term.c_lflag &= ~(ICANON | ECHO);
+    term.c_iflag &= ~(IXON | ICRNL);
+
+    term.c_cc[VMIN] = 0;
+    term.c_cc[VTIME] = 1;
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
+void EngoNet::disable_raw_mode() {
+    struct termios term;
+    tcgetattr(STDIN_FILENO, &term);
+    term.c_lflag |= ICANON;
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
 
 bool EngoNet::is_running() const noexcept { return run; }
 

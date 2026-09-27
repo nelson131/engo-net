@@ -14,8 +14,7 @@ void Console::draw(Buffer& buf) {
                 message.author + ": " + message.content);
     }
 
-    buf.put(engo::Pair<size_t, size_t>(x - 1, y),
-            "> " + text_input.get_current());
+    buf.put(engo::Pair<size_t, size_t>(x, y), "> " + text_input.get_current());
 }
 
 const Rect& Console::get_rect() const noexcept { return rect; }

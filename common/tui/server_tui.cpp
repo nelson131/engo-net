@@ -23,6 +23,8 @@ void ServerTUI::render() {
     buf.render();
 }
 
+void ServerTUI::write_console(char c) { console->get_input().put(c); }
+
 void ServerTUI::draw_state() {
     rect->draw(buf);
 

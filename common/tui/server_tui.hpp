@@ -14,6 +14,8 @@ class ServerTUI : public TUI {
 
     void render() override;
 
+    void write_console(char c);
+
    private:
     void draw_state() override;
     void make_header() override;

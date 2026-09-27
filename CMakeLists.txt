@@ -30,4 +30,5 @@ add_executable(engo-net
     common/tui/message_list.cpp
     common/tui/text_input.cpp
     common/tui/console.cpp
+    common/tui/input_handler.cpp
 )

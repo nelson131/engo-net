@@ -13,7 +13,12 @@ class EngoNet {
 
     virtual void loop();
 
+    virtual void handle_input();
+
     void quit() noexcept;
+
+    void enable_raw_mode();
+    void disable_raw_mode();
 
     bool is_running() const noexcept;
 
