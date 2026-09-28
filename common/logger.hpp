@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <functional>
 #include <iomanip>
 #include <mutex>
 #include <sstream>
@@ -11,10 +12,14 @@ class Logger {
    public:
     enum Type { DEBUG, SUCCESS, INFO, WARNING, ERROR };
 
+    using Callback =
+        std::function<void(const std::string&, const std::string&)>;
+
    public:
     Logger(const std::string& path);
     ~Logger();
 
+    // log only in logfile
     template <typename... targs>
     void log(Type type, const targs&... args) {
         std::lock_guard lock(mutex);
@@ -22,20 +27,32 @@ class Logger {
         std::ostringstream ss;
         (ss << ... << args);
 
-        const auto now = std::chrono::system_clock::now();
-        const auto time = std::chrono::system_clock::to_time_t(now);
-
-        std::tm tm{};
-        localtime_r(&time, &tm);
-
-        file << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " ["
-             << type_msgs[type] << "] -> " << ss.str() << "\n";
-        file.flush();
+        write_logfile(type, ss.str());
     }
+
+    // log in logfile and into callback too
+    template <typename... targs>
+    void tlog(Type type, const targs&... args) {
+        std::lock_guard lock(mutex);
+
+        std::ostringstream ss;
+        (ss << ... << args);
+
+        write_logfile(type, ss.str());
+
+        if (callback) callback(type_msgs[type], ss.str());
+    }
+
+    void set_callback(Callback callback);
 
    private:
     std::ofstream file;
     std::mutex    mutex;
 
     std::vector<std::string> type_msgs;
+
+    Callback callback;
+
+   private:
+    void write_logfile(Type type, const std::string& message);
 };

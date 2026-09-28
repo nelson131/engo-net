@@ -1,8 +1,8 @@
 #include "server_tui.hpp"
 
 ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
-                     ServerState& state, Config& config)
-    : TUI(screen_meta, config), state(state) {
+                     ServerState& state, Config& config, Logger& logger)
+    : TUI(screen_meta, config), state(state), logger(logger) {
     buf.clear();
 
     size_t rect_w = (size_t)screen_meta.x * 0.25;
@@ -19,6 +19,8 @@ ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
 
 void ServerTUI::render() {
     buf.clear();
+    process_logs();
+
     make_header();
     draw_state();
     buf.render();
@@ -34,6 +36,11 @@ void ServerTUI::write_console(const std::string& author,
 void ServerTUI::pop_console() { console->get_input().backspace(); }
 
 std::string ServerTUI::sumbit_console() { return console->sumbit_input(); }
+
+void ServerTUI::add_log(const std::string& type, const std::string& message) {
+    std::lock_guard lock(log_mutex);
+    log_queue.push(type + " -> " + message);
+}
 
 void ServerTUI::draw_state() {
     rect->draw(buf);
@@ -80,4 +87,13 @@ void ServerTUI::make_header() {
     // BOTTOM SIDE
     buf.put(engo::Pair<size_t, size_t>{0, buf.get_wrows() - 3}, get_sep(),
             COLOR_DEFAULT, COLOR_DEFAULT, STYLE_BOLD);
+}
+
+void ServerTUI::process_logs() {
+    std::lock_guard lock(log_mutex);
+
+    while (!log_queue.empty()) {
+        write_console("server", log_queue.front());
+        log_queue.pop();
+    }
 }

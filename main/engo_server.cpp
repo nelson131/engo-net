@@ -2,7 +2,13 @@
 
 EngoServer::EngoServer(size_t wcols, size_t wrows)
     : EngoNet(),
-      tui(engo::Pair<size_t, size_t>{wcols, wrows}, state, get_config()) {
+      tui(engo::Pair<size_t, size_t>{wcols, wrows}, state, get_config(),
+          get_logger()) {
+    get_logger().set_callback(
+        [this](const std::string& type, const std::string& msg) {
+            tui.add_log(type, msg);
+        });
+
     tui_thread = std::thread([this] {
         using namespace std::chrono_literals;
 
@@ -74,8 +80,8 @@ void EngoServer::execute_cmd(const std::string& input) {
             break;
         case CommandType::START:
             if (cmd.args.size() != 2) {
-                tui.write_console("server",
-                                  "[ERROR] usage: start <ip_addr> <port>");
+                get_logger().tlog(Logger::ERROR,
+                                  "usage: start <ip_addr> <port>");
                 break;
             }
             if (!internal_node) {
@@ -84,18 +90,17 @@ void EngoServer::execute_cmd(const std::string& input) {
                     state, get_logger());
 
                 network_thread = std::thread([this] { internal_node->run(); });
-                tui.write_console("server", "server started on " + cmd.args[0] +
-                                                ":" + cmd.args[1]);
+                get_logger().tlog(Logger::INFO, "server started on ",
+                                  cmd.args[0], ":", cmd.args[1]);
             } else {
-                tui.write_console("server",
-                                  "[ERROR] server is already running");
+                get_logger().tlog(Logger::ERROR, "server is already running");
             }
             break;
         case CommandType::STOP:
             stop_network();
             break;
         case CommandType::UNKNOWN:
-            tui.write_console("server", "[ERROR] unknown command");
+            get_logger().tlog(Logger::ERROR, "unknown command");
             break;
         default:
             break;
