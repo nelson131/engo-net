@@ -26,6 +26,8 @@ class EngoServer : public EngoNet {
 
    private:
     void handle_input() override;
+
+    void stop_network();
     void stop();
 
     void execute_cmd(const std::string& input);

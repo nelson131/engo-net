@@ -43,20 +43,23 @@ void EngoServer::handle_input() {
     }
 }
 
-void EngoServer::stop() {
+void EngoServer::stop_network() {
     if (internal_node) {
         internal_node->stop();
+        internal_node.reset();
     }
 
     if (network_thread.joinable()) {
         network_thread.join();
     }
+}
+
+void EngoServer::stop() {
+    stop_network();
 
     if (tui_thread.joinable()) {
         tui_thread.join();
     }
-
-    internal_node.reset();
 }
 
 void EngoServer::execute_cmd(const std::string& input) {
@@ -69,7 +72,30 @@ void EngoServer::execute_cmd(const std::string& input) {
         case CommandType::HELP:
             tui.write_console("server", get_help_msg());
             break;
+        case CommandType::START:
+            if (cmd.args.size() != 2) {
+                tui.write_console("server",
+                                  "[ERROR] usage: start <ip_addr> <port>");
+                break;
+            }
+            if (!internal_node) {
+                internal_node = std::make_unique<InternalNode>(
+                    cmd.args[0], static_cast<uint16_t>(std::stoul(cmd.args[1])),
+                    state, get_logger());
+
+                network_thread = std::thread([this] { internal_node->run(); });
+                tui.write_console("server", "server started on " + cmd.args[0] +
+                                                ":" + cmd.args[1]);
+            } else {
+                tui.write_console("server",
+                                  "[ERROR] server is already running");
+            }
+            break;
+        case CommandType::STOP:
+            stop_network();
+            break;
         case CommandType::UNKNOWN:
+            tui.write_console("server", "[ERROR] unknown command");
             break;
         default:
             break;
@@ -77,5 +103,7 @@ void EngoServer::execute_cmd(const std::string& input) {
 }
 
 std::string EngoServer::get_help_msg() const noexcept {
-    return "exit -> quit from application, help -> send this message";
+    return "exit -> quit from application, help -> send this message, start "
+           "<ip_addr> <port> -> start the server, stop -> stop the network "
+           "side";
 }

@@ -1,3 +1,3 @@
 #pragma once
 
-enum CommandType { UNKNOWN, EXIT, HELP };
+enum CommandType { UNKNOWN, EXIT, HELP, START, STOP };

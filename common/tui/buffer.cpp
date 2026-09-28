@@ -252,6 +252,45 @@ void Buffer::render() {
     std::cout.flush();
 }
 
+std::vector<std::string> Buffer::wrap(std::string_view text,
+                                      size_t           max_width) const {
+    std::vector<std::string> lines;
+    if (max_width == 0) return lines;
+
+    std::string current;
+    size_t      current_width = 0;
+    size_t      offset = 0;
+
+    while (offset < text.size()) {
+        size_t char_offset = offset;
+
+        c32 c;
+        if (!utf8_decode(text, offset, c)) break;
+
+        size_t width = codepoint_width(c);
+        if (width == 0) continue;
+        if (current_width + width > max_width) {
+            if (!current.empty()) {
+                lines.push_back(std::move(current));
+                current.clear();
+            }
+
+            current_width = 0;
+
+            if (width > max_width) continue;
+        }
+
+        current.append(text.substr(char_offset, offset - char_offset));
+        current_width += width;
+    }
+
+    if (!current.empty()) {
+        lines.push_back(std::move(current));
+    }
+
+    return lines;
+}
+
 size_t Buffer::get_wcols() const noexcept { return window_cols; }
 
 size_t Buffer::get_wrows() const noexcept { return window_rows; }

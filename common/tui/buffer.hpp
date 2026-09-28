@@ -57,6 +57,9 @@ class Buffer {
 
     void render();
 
+    std::vector<std::string> wrap(std::string_view text,
+                                  size_t           max_width) const;
+
     Cell& get_cell(engo::Pair<size_t, size_t> pos);
 
     size_t get_wcols() const noexcept;

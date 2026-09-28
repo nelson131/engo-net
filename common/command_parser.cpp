@@ -3,6 +3,8 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "command_type.hpp"
+
 CommandParser::CommandParser() {}
 
 Command CommandParser::parse(const std::string& input) {
@@ -13,10 +15,14 @@ Command CommandParser::parse(const std::string& input) {
     std::istringstream ss(input);
     std::string        arg;
 
+    bool b = 0;
     while (ss >> arg) {
-        if (res.args.size() == 0) {
+        if (!b) {
             res.type = convert_type(arg);
             if (res.type == UNKNOWN) return res;
+
+            b = 1;
+            continue;
         }
 
         res.args.push_back(arg);
@@ -26,8 +32,8 @@ Command CommandParser::parse(const std::string& input) {
 }
 
 CommandType CommandParser::convert_type(const std::string& cmd) const {
-    static std::unordered_map<std::string, CommandType> map = {{"exit", EXIT},
-                                                               {"help", HELP}};
+    static std::unordered_map<std::string, CommandType> map = {
+        {"exit", EXIT}, {"help", HELP}, {"start", START}, {"stop", STOP}};
 
     auto it = map.find(cmd);
     if (it != map.end()) {

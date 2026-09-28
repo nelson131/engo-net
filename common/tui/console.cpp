@@ -10,8 +10,12 @@ void Console::draw(Buffer& buf) {
     std::span<Message> span = message_list.get_span();
 
     for (const auto& message : span) {
-        buf.put(engo::Pair<size_t, size_t>{x, y++},
-                message.author + ": " + message.content);
+        std::string              msg = message.author + ": " + message.content;
+        std::vector<std::string> lines = buf.wrap(msg, rect.get_size().x - 3);
+
+        for (const auto& line : lines) {
+            buf.put({x, y++}, line);
+        }
     }
 
     buf.put(engo::Pair<size_t, size_t>(x, y), "> " + text_input.get_current());
