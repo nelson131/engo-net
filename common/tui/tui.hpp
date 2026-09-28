@@ -6,6 +6,7 @@
 class TUI {
    public:
     TUI(const engo::Pair<size_t, size_t>& screen_meta, Config& config);
+    ~TUI();
 
     virtual void render();
 

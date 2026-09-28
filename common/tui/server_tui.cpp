@@ -18,6 +18,7 @@ ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
 }
 
 void ServerTUI::render() {
+    buf.clear();
     make_header();
     draw_state();
     buf.render();
@@ -27,13 +28,7 @@ void ServerTUI::write_console(char c) { console->get_input().put(c); }
 
 void ServerTUI::pop_console() { console->get_input().backspace(); }
 
-void ServerTUI::sumbit_console() {
-    console->sumbit_input();
-
-    const Rect& r = console->get_rect();
-    buf.clear_square({r.get_vec().x + 1, r.get_vec().y + 1},
-                     {r.get_size().x - 2, r.get_size().y - 2});
-}
+void ServerTUI::sumbit_console() { console->sumbit_input(); }
 
 void ServerTUI::draw_state() {
     rect->draw(buf);

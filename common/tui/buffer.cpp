@@ -29,10 +29,13 @@ void Buffer::clear() {
 
 void Buffer::clear_square(const engo::Pair<size_t, size_t>& v,
                           const engo::Pair<size_t, size_t>& size) {
-    if (v.x + size.x >= window_cols || v.y + size.y >= window_rows) return;
+    if (v.x >= window_cols || v.y >= window_rows) return;
 
-    for (size_t y = v.y; y < size.y; y++) {
-        for (size_t x = v.x; x < size.x; x++) {
+    size_t end_x = std::min(v.x + size.x, window_cols);
+    size_t end_y = std::min(v.y + size.y, window_rows);
+
+    for (size_t y = v.y; y < end_y; y++) {
+        for (size_t x = v.x; x < end_x; x++) {
             cell_reset(actual[to_index({x, y})]);
         }
     }
