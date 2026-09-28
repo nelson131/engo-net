@@ -17,6 +17,7 @@ add_executable(engo-net
     client/tcp_client.cpp
     client/user.cpp
     common/logger.cpp
+    common/command_parser.cpp
     common/network/connection.cpp
     common/network/socket.cpp
     common/network/packet.cpp

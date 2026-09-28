@@ -26,9 +26,14 @@ void ServerTUI::render() {
 
 void ServerTUI::write_console(char c) { console->get_input().put(c); }
 
+void ServerTUI::write_console(const std::string& author,
+                              const std::string& msg) {
+    console->get_message_list().add(author, msg);
+}
+
 void ServerTUI::pop_console() { console->get_input().backspace(); }
 
-void ServerTUI::sumbit_console() { console->sumbit_input(); }
+std::string ServerTUI::sumbit_console() { return console->sumbit_input(); }
 
 void ServerTUI::draw_state() {
     rect->draw(buf);

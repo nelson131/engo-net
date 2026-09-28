@@ -15,8 +15,9 @@ class ServerTUI : public TUI {
     void render() override;
 
     void write_console(char c);
+    void write_console(const std::string& author, const std::string& message);
     void pop_console();
-    void sumbit_console();
+    std::string sumbit_console();
 
    private:
     void draw_state() override;

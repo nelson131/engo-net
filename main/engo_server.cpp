@@ -26,13 +26,9 @@ void EngoServer::handle_input() {
     int key = input_handler.poll();
     if (key == InputHandler::NONE) return;
 
-    if (key == 'q') {
-        quit();
-        return;
-    }
-
     if (key == InputHandler::ENTER1 || key == InputHandler::ENTER2) {
-        tui.sumbit_console();
+        std::string input = tui.sumbit_console();
+        execute_cmd(input);
         return;
     }
 
@@ -61,4 +57,25 @@ void EngoServer::stop() {
     }
 
     internal_node.reset();
+}
+
+void EngoServer::execute_cmd(const std::string& input) {
+    Command cmd = command_parser.parse(input);
+
+    switch (cmd.type) {
+        case CommandType::EXIT:
+            quit();
+            break;
+        case CommandType::HELP:
+            tui.write_console("server", get_help_msg());
+            break;
+        case CommandType::UNKNOWN:
+            break;
+        default:
+            break;
+    }
+}
+
+std::string EngoServer::get_help_msg() const noexcept {
+    return "exit -> quit from application, help -> send this message";
 }

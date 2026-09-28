@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "../common/command_parser.hpp"
 #include "../common/tui/input_handler.hpp"
 #include "../common/tui/server_tui.hpp"
 #include "../server/internal_node.hpp"
@@ -18,11 +19,16 @@ class EngoServer : public EngoNet {
    private:
     std::unique_ptr<InternalNode> internal_node;
 
-    ServerTUI    tui;
-    ServerState  state;
-    InputHandler input_handler;
+    ServerTUI     tui;
+    ServerState   state;
+    InputHandler  input_handler;
+    CommandParser command_parser;
 
    private:
     void handle_input() override;
     void stop();
+
+    void execute_cmd(const std::string& input);
+
+    std::string get_help_msg() const noexcept;
 };

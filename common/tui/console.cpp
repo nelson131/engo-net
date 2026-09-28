@@ -1,7 +1,7 @@
 #include "console.hpp"
 
 Console::Console(const Rect& rect)
-    : rect(rect), message_list(rect.get_size().y - 3) {}
+    : rect(rect), message_list(rect.get_size().y - 4) {}
 
 void Console::draw(Buffer& buf) {
     rect.draw(buf);
@@ -17,12 +17,16 @@ void Console::draw(Buffer& buf) {
     buf.put(engo::Pair<size_t, size_t>(x, y), "> " + text_input.get_current());
 }
 
-void Console::sumbit_input() {
+std::string Console::sumbit_input() {
+    std::string input = text_input.get_current();
+    if (input.empty()) return {};
+
     message_list.add(
         {"admin", text_input.get_current(), std::chrono::system_clock::now()});
 
     text_input.clear();
-    message_list.scroll_down();
+
+    return input;
 }
 
 const Rect& Console::get_rect() const noexcept { return rect; }

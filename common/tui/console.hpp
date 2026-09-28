@@ -9,8 +9,8 @@ class Console {
    public:
     Console(const Rect& rect);
 
-    void draw(Buffer& buf);
-    void sumbit_input();
+    void        draw(Buffer& buf);
+    std::string sumbit_input();
 
     const Rect& get_rect() const noexcept;
     void        change_rect(const Rect& rect) noexcept;
