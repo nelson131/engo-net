@@ -1,18 +1,31 @@
 #include "client_tui.hpp"
 
 ClientTUI::ClientTUI(const engo::Pair<size_t, size_t>& screen_meta,
-                     Config&                           config)
-    : TUI(screen_meta, config) {
+                     Config& config, Logger& logger)
+    : TUI(screen_meta, config), logger(logger) {
     buf.clear();
+
+    size_t rect_w = (size_t)screen_meta.x * 0.25;
+    focus_rect = std::make_unique<Rect>(
+        engo::Pair<size_t, size_t>{0, 3},
+        engo::Pair<size_t, size_t>{rect_w, screen_meta.y - 6});
 }
 
 void ClientTUI::render() {
+    buf.clear();
+
     make_header();
     draw_state();
     buf.render();
 }
 
-void ClientTUI::draw_state() {}
+void ClientTUI::draw_state() {
+    focus_rect->draw(buf);
+
+    // clients chats
+
+    // chat lol
+}
 
 void ClientTUI::make_header() {
     // TOP SIDE

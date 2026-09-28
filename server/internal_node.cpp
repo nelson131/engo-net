@@ -110,16 +110,16 @@ void InternalNode::run() {
 
                     while (auto packet = connection.get_ready_packet()) {
                         // TODO ready packet lol
-                        std::cout << "received a packet: " << std::endl;
-                        std::cout << "type: " << packet->header.type
-                                  << std::endl;
-                        std::cout << "data: "
-                                  << std::string(packet->data.begin(),
-                                                 packet->data.end())
-                                  << std::endl;
+                        logger.tlog(Logger::INFO, "received a packet: ");
+                        logger.tlog(Logger::INFO,
+                                    "type: ", packet->header.type);
+                        logger.tlog(Logger::INFO, "data: ",
+                                    std::string(packet->data.begin(),
+                                                packet->data.end()));
                         if (!connection.send(*packet)) {
-                            std::cout << "failed to send the packet from server"
-                                      << std::endl;
+                            logger.tlog(
+                                Logger::ERROR,
+                                "failed to send the packet from server");
                         }
                     }
                 }

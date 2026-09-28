@@ -3,7 +3,9 @@
 #include <iostream>
 
 EngoClient::EngoClient(size_t wcols, size_t wrows)
-    : EngoNet(), tui(engo::Pair<size_t, size_t>{wcols, wrows}, get_config()) {
+    : EngoNet(),
+      tui(engo::Pair<size_t, size_t>{wcols, wrows}, get_config(),
+          get_logger()) {
     tui_thread = std::thread([this] { tui.render(); });
 }
 

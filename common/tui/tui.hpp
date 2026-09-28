@@ -12,8 +12,6 @@ class TUI {
 
     const std::string& get_sep() const noexcept;
 
-    int get_state() const noexcept;
-
    protected:
     Buffer buf;
 
@@ -23,8 +21,6 @@ class TUI {
 
    private:
     Config& config;
-
-    int state;
 
     std::string sep;
 };

@@ -45,8 +45,8 @@ void ServerTUI::add_log(const std::string& type, const std::string& message) {
 void ServerTUI::draw_state() {
     rect->draw(buf);
 
-    size_t x = 1;
-    size_t y = 4;
+    size_t x = rect->get_vec().x + 1;
+    size_t y = rect->get_vec().y + 1;
 
     // Server status >>>
     // 1 section: status, addr, port
