@@ -2,6 +2,7 @@
 
 #include "../client/tui/client_tui.hpp"
 #include "../client/user.hpp"
+#include "../common/command_parser.hpp"
 #include "engo_net.hpp"
 
 class EngoClient : public EngoNet {
@@ -12,9 +13,12 @@ class EngoClient : public EngoNet {
    private:
     std::unique_ptr<User> user;
 
-    ClientTUI tui;
+    ClientTUI     tui;
+    CommandParser command_parser;
 
    private:
     void stop_overall() override;
     void stop_network() override;
+
+    void execute_cmd(const std::string& input);
 };

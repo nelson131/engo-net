@@ -7,7 +7,7 @@
 
 class Console {
    public:
-    Console(const Rect& rect);
+    Console(const std::string& author, const Rect& rect);
 
     void        draw(Buffer& buf);
     std::string sumbit_input();
@@ -19,7 +19,8 @@ class Console {
     TextInput&   get_input();
 
    private:
-    Rect rect;
+    std::string author;
+    Rect        rect;
 
     MessageList message_list;
     TextInput   text_input;

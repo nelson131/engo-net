@@ -17,6 +17,7 @@ ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
     rect_floor = std::string(rect->get_size().x - 2, '-');
 
     console = std::make_unique<Console>(
+        "admin",
         Rect{{rect->get_vec().x + rect->get_size().x + 1, rect->get_vec().y},
              {screen_meta.x - rect->get_size().x - 1, screen_meta.y - 6}});
 }

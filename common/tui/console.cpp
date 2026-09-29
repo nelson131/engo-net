@@ -1,7 +1,7 @@
 #include "console.hpp"
 
-Console::Console(const Rect& rect)
-    : rect(rect), message_list(rect.get_size().y - 4) {}
+Console::Console(const std::string& author, const Rect& rect)
+    : author(author), rect(rect), message_list(rect.get_size().y - 4) {}
 
 void Console::draw(Buffer& buf) {
     rect.draw(buf);
@@ -26,7 +26,7 @@ std::string Console::sumbit_input() {
     if (input.empty()) return {};
 
     message_list.add(
-        {"admin", text_input.get_current(), std::chrono::system_clock::now()});
+        {author, text_input.get_current(), std::chrono::system_clock::now()});
 
     text_input.clear();
 
