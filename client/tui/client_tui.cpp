@@ -2,29 +2,31 @@
 
 ClientTUI::ClientTUI(const engo::Pair<size_t, size_t>& screen_meta,
                      Config& config, Logger& logger)
-    : TUI(screen_meta, config), logger(logger) {
+    : TUI(screen_meta), logger(logger) {
     buf.clear();
 
     size_t rect_w = (size_t)screen_meta.x * 0.25;
-    focus_rect = std::make_unique<Rect>(
+    chats_rect = std::make_unique<Rect>(
         engo::Pair<size_t, size_t>{0, 3},
         engo::Pair<size_t, size_t>{rect_w, screen_meta.y - 6});
+
+    rect_floor = std::string(rect_w - 2, '2');
 }
 
 void ClientTUI::render() {
     buf.clear();
-
     make_header();
-    draw_state();
-    buf.render();
-}
 
-void ClientTUI::draw_state() {
-    focus_rect->draw(buf);
+    chats_rect->draw(buf);
 
     // clients chats
+    size_t x = chats_rect->get_vec().x + 1;
+    size_t y = chats_rect->get_vec().y + 1;
+    buf.put({x, y}, "engo-net =>", COLOR_BLUE, COLOR_DEFAULT, STYLE_BOLD);
 
     // chat lol
+
+    buf.render();
 }
 
 void ClientTUI::make_header() {

@@ -2,50 +2,30 @@
 
 EngoServer::EngoServer(size_t wcols, size_t wrows)
     : EngoNet(),
-      tui(engo::Pair<size_t, size_t>{wcols, wrows}, state, get_config(),
-          get_logger()) {
+      tui(
+          engo::Pair<size_t, size_t>{wcols, wrows}, state,
+          [this](const std::string& cmd) { execute_cmd(cmd); }, get_logger()) {
     get_logger().set_callback(
         [this](const std::string& type, const std::string& msg) {
             tui.add_log(type, msg);
         });
 
     tui_thread = std::thread([this] {
-        using namespace std::chrono_literals;
-
         while (is_running()) {
-            handle_input();
-            tui.render();
+            using namespace std::chrono_literals;
+            tui.run();
             std::this_thread::sleep_for(16ms);
         }
     });
 }
 
-EngoServer::~EngoServer() { stop(); }
+EngoServer::~EngoServer() { stop_overall(); }
 
-void EngoServer::loop() {
-    while (is_running()) {
-        // network
-    }
-}
+void EngoServer::stop_overall() {
+    stop_network();
 
-void EngoServer::handle_input() {
-    int key = input_handler.poll();
-    if (key == InputHandler::NONE) return;
-
-    if (key == InputHandler::ENTER1 || key == InputHandler::ENTER2) {
-        std::string input = tui.sumbit_console();
-        execute_cmd(input);
-        return;
-    }
-
-    if (key == InputHandler::BACKSPACE) {
-        tui.pop_console();
-        return;
-    }
-
-    if (key >= 32 && key <= 126) {
-        tui.write_console(key);
-        return;
+    if (tui_thread.joinable()) {
+        tui_thread.join();
     }
 }
 
@@ -60,14 +40,6 @@ void EngoServer::stop_network() {
     }
 }
 
-void EngoServer::stop() {
-    stop_network();
-
-    if (tui_thread.joinable()) {
-        tui_thread.join();
-    }
-}
-
 void EngoServer::execute_cmd(const std::string& input) {
     Command cmd = command_parser.parse(input);
 
@@ -76,7 +48,7 @@ void EngoServer::execute_cmd(const std::string& input) {
             quit();
             break;
         case CommandType::HELP:
-            tui.write_console("server", get_help_msg());
+            tui.send_help_msg();
             break;
         case CommandType::START:
             if (cmd.args.size() != 2) {
@@ -105,10 +77,4 @@ void EngoServer::execute_cmd(const std::string& input) {
         default:
             break;
     }
-}
-
-std::string EngoServer::get_help_msg() const noexcept {
-    return "exit -> quit from application, help -> send this message, start "
-           "<ip_addr> <port> -> start the server, stop -> stop the network "
-           "side";
 }

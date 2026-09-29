@@ -1,8 +1,12 @@
 #include "server_tui.hpp"
 
 ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
-                     ServerState& state, Config& config, Logger& logger)
-    : TUI(screen_meta, config), state(state), logger(logger) {
+                     ServerState& state, CommandCallback cmd_callback,
+                     Logger& logger)
+    : TUI(screen_meta),
+      state(state),
+      cmd_callback(std::move(cmd_callback)),
+      logger(logger) {
     buf.clear();
 
     size_t rect_w = (size_t)screen_meta.x * 0.25;
@@ -17,32 +21,29 @@ ServerTUI::ServerTUI(const engo::Pair<size_t, size_t>& screen_meta,
              {screen_meta.x - rect->get_size().x - 1, screen_meta.y - 6}});
 }
 
-void ServerTUI::render() {
-    buf.clear();
-    process_logs();
-
-    make_header();
-    draw_state();
-    buf.render();
+void ServerTUI::run() {
+    handle_input();
+    render();
 }
 
-void ServerTUI::write_console(char c) { console->get_input().put(c); }
+void ServerTUI::send_help_msg() {
+    std::string msg =
+        "exit -> quit from application, help -> send this message, start "
+        "<ip_addr> <port> -> start the server, stop -> stop the network side";
 
-void ServerTUI::write_console(const std::string& author,
-                              const std::string& msg) {
-    console->get_message_list().add(author, msg);
+    console->get_message_list().add("server", msg);
 }
-
-void ServerTUI::pop_console() { console->get_input().backspace(); }
-
-std::string ServerTUI::sumbit_console() { return console->sumbit_input(); }
 
 void ServerTUI::add_log(const std::string& type, const std::string& message) {
     std::lock_guard lock(log_mutex);
     log_queue.push(type + " -> " + message);
 }
 
-void ServerTUI::draw_state() {
+void ServerTUI::render() {
+    buf.clear();
+    process_logs();
+    make_header();
+
     rect->draw(buf);
 
     size_t x = rect->get_vec().x + 1;
@@ -73,6 +74,28 @@ void ServerTUI::draw_state() {
 
     // Console >>
     console->draw(buf);
+
+    buf.render();
+}
+
+void ServerTUI::handle_input() {
+    int key = input_handler.poll();
+    if (key == InputHandler::NONE) return;
+
+    if (key == InputHandler::ENTER1 || key == InputHandler::ENTER2) {
+        sumbit_console();
+        return;
+    }
+
+    if (key == InputHandler::BACKSPACE) {
+        console->get_input().backspace();
+        return;
+    }
+
+    if (key >= 32 && key <= 126) {
+        console->get_input().put(key);
+        return;
+    }
 }
 
 void ServerTUI::make_header() {
@@ -89,11 +112,18 @@ void ServerTUI::make_header() {
             COLOR_DEFAULT, COLOR_DEFAULT, STYLE_BOLD);
 }
 
+void ServerTUI::sumbit_console() {
+    std::string cmd = console->sumbit_input();
+    if (cmd_callback) {
+        cmd_callback(cmd);
+    }
+}
+
 void ServerTUI::process_logs() {
     std::lock_guard lock(log_mutex);
 
     while (!log_queue.empty()) {
-        write_console("server", log_queue.front());
+        console->get_message_list().add("server", log_queue.front());
         log_queue.pop();
     }
 }

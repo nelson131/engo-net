@@ -11,10 +11,6 @@ class EngoNet {
    public:
     EngoNet();
 
-    virtual void loop();
-
-    virtual void handle_input();
-
     void quit() noexcept;
 
     bool is_running() const noexcept;
@@ -24,7 +20,8 @@ class EngoNet {
     std::thread tui_thread;
 
    protected:
-    std::vector<std::string> get_args(const std::string& input) const;
+    virtual void stop_overall();
+    virtual void stop_network();
 
     Logger& get_logger() const noexcept;
     Config& get_config() const noexcept;

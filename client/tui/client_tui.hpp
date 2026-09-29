@@ -1,10 +1,13 @@
 #pragma once
 
-#include "../logger.hpp"
-#include "rect.hpp"
-#include "tui.hpp"
+#include "../../common/logger.hpp"
+#include "../../common/tui/rect.hpp"
+#include "../../common/tui/tui.hpp"
 
 class ClientTUI : public TUI {
+   public:
+    enum FocusState { CHATS, MESSAGES };
+
    public:
     ClientTUI(const engo::Pair<size_t, size_t>& screen_meta, Config& config,
               Logger& logger);
@@ -12,15 +15,13 @@ class ClientTUI : public TUI {
     void render() override;
 
    private:
-    enum FocusState { LIST, CHAT };
-
-   private:
     Logger& logger;
 
-    FocusState            focus_state;
-    std::unique_ptr<Rect> focus_rect;
+    std::unique_ptr<Rect> chats_rect;
+    std::string           rect_floor;
+
+    FocusState focus_state;
 
    private:
-    void draw_state() override;
     void make_header() override;
 };

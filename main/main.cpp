@@ -16,12 +16,10 @@ int main(int argc, char* argv[]) {
 
     if (mode == "client") {
         EngoClient engo_client{w.ws_col, w.ws_row};
-        engo_client.loop();
     }
 
     if (mode == "server") {
         EngoServer engo_server{w.ws_col, w.ws_row};
-        engo_server.loop();
     }
 
     return 0;

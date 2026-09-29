@@ -14,8 +14,10 @@ add_executable(engo-net
     main/engo_client.cpp
     server/tcp_server.cpp
     server/internal_node.cpp
+    server/tui/server_tui.cpp
     client/tcp_client.cpp
     client/user.cpp
+    client/tui/client_tui.cpp
     common/logger.cpp
     common/command_parser.cpp
     common/network/connection.cpp
@@ -24,8 +26,6 @@ add_executable(engo-net
     common/file_handling/filesystem.cpp
     common/file_handling/formed_file.cpp
     common/tui/buffer.cpp
-    common/tui/server_tui.cpp
-    common/tui/client_tui.cpp
     common/tui/tui.cpp
     common/tui/rect.cpp
     common/tui/message_list.cpp

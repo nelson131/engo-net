@@ -15,25 +15,13 @@ EngoNet::EngoNet() : run(1) {
                                       cfg_file_name);
 }
 
-void EngoNet::loop() {}
-
-void EngoNet::handle_input() {}
-
 void EngoNet::quit() noexcept { run = 0; }
 
 bool EngoNet::is_running() const noexcept { return run; }
 
-std::vector<std::string> EngoNet::get_args(const std::string& input) const {
-    std::istringstream       stream(input);
-    std::string              arg;
-    std::vector<std::string> args;
+void EngoNet::stop_overall() {}
 
-    while (stream >> arg) {
-        args.push_back(arg);
-    }
-
-    return args;
-}
+void EngoNet::stop_network() {}
 
 Logger& EngoNet::get_logger() const noexcept { return *logger; }
 

@@ -5,10 +5,10 @@
 
 class TUI {
    public:
-    TUI(const engo::Pair<size_t, size_t>& screen_meta, Config& config);
+    TUI(const engo::Pair<size_t, size_t>& screen_meta);
     ~TUI();
 
-    virtual void render();
+    virtual void run();
 
     const std::string& get_sep() const noexcept;
 
@@ -16,11 +16,11 @@ class TUI {
     Buffer buf;
 
    protected:
-    virtual void draw_state();
+    virtual void render();
+    virtual void handle_input();
+
     virtual void make_header();
 
    private:
-    Config& config;
-
     std::string sep;
 };

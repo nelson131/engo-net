@@ -9,15 +9,17 @@ EngoClient::EngoClient(size_t wcols, size_t wrows)
     tui_thread = std::thread([this] { tui.render(); });
 }
 
-EngoClient::~EngoClient() { stop(); }
+EngoClient::~EngoClient() { stop_overall(); }
 
-void EngoClient::loop() {
-    while (is_running()) {
-        tui.render();
+void EngoClient::stop_overall() {
+    stop_network();
+
+    if (tui_thread.joinable()) {
+        tui_thread.join();
     }
 }
 
-void EngoClient::stop() {
+void EngoClient::stop_network() {
     if (user) {
         user->stop();
         user.reset();
@@ -25,9 +27,5 @@ void EngoClient::stop() {
 
     if (network_thread.joinable()) {
         network_thread.join();
-    }
-
-    if (tui_thread.joinable()) {
-        tui_thread.join();
     }
 }
