@@ -22,11 +22,20 @@ void ClientTUI::run() {
     render();
 }
 
+void ClientTUI::send_help_msg() {
+    std::string msg =
+        "exit -> quit from application, help -> send this message, stop -> "
+        "stop the network side";
+
+    console->get_message_list().add("engo-net", msg);
+}
+
 void ClientTUI::render() {
     buf.clear();
     make_header(CONFIG_ENGO_NAME + std::string(" ") + CONFIG_ENGO_VERSION +
                 std::string(" -> client TUI"));
     make_chats_section();
+    if (console) process_logs(*console, "engo-net");
 
     switch (focus_state) {
         case GENERAL_CHATS:

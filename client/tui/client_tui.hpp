@@ -17,6 +17,8 @@ class ClientTUI : public TUI {
 
     void run() override;
 
+    void send_help_msg();
+
    private:
     engo::Pair<size_t, size_t> screen_meta;
 

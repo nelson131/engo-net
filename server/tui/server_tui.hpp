@@ -22,7 +22,6 @@ class ServerTUI : public TUI {
     void run() override;
 
     void send_help_msg();
-    void add_log(const std::string& type, const std::string& message);
 
    private:
     ServerState& state;
@@ -36,14 +35,9 @@ class ServerTUI : public TUI {
     std::unique_ptr<Rect> rect;
     std::string           rect_floor;
 
-    std::mutex              log_mutex;
-    std::queue<std::string> log_queue;
-
    private:
     void render() override;
     void handle_input() override;
 
     void sumbit_console();
-
-    void process_logs();
 };

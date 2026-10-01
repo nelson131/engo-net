@@ -13,6 +13,11 @@ TUI::~TUI() { std::cout << "\033[?25h"; }
 
 void TUI::run() {}
 
+void TUI::add_log(const std::string& type, const std::string& message) {
+    std::lock_guard lock(log_mutex);
+    log_queue.push(type + " -> " + message);
+}
+
 const std::string& TUI::get_sep() const noexcept { return sep; }
 
 void TUI::render() {}
@@ -39,5 +44,14 @@ void TUI::handle_console_input(Console& console, int key) {
 
     if (key >= 32 && key <= 126) {
         console.get_input().put(key);
+    }
+}
+
+void TUI::process_logs(Console& console, const std::string& author) {
+    std::lock_guard lock(log_mutex);
+
+    while (!log_queue.empty()) {
+        console.get_message_list().add(author, log_queue.front());
+        log_queue.pop();
     }
 }

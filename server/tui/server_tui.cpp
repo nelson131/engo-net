@@ -35,14 +35,9 @@ void ServerTUI::send_help_msg() {
     console->get_message_list().add("server", msg);
 }
 
-void ServerTUI::add_log(const std::string& type, const std::string& message) {
-    std::lock_guard lock(log_mutex);
-    log_queue.push(type + " -> " + message);
-}
-
 void ServerTUI::render() {
     buf.clear();
-    process_logs();
+    process_logs(*console, "server");
     make_header(CONFIG_ENGO_NAME + std::string(" ") + CONFIG_ENGO_VERSION +
                 std::string(" -> server TUI"));
 
@@ -96,14 +91,5 @@ void ServerTUI::sumbit_console() {
     std::string cmd = console->sumbit_input();
     if (cmd_callback) {
         cmd_callback(cmd);
-    }
-}
-
-void ServerTUI::process_logs() {
-    std::lock_guard lock(log_mutex);
-
-    while (!log_queue.empty()) {
-        console->get_message_list().add("server", log_queue.front());
-        log_queue.pop();
     }
 }

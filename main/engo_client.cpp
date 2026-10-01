@@ -7,6 +7,11 @@ EngoClient::EngoClient(size_t wcols, size_t wrows)
       tui(
           engo::Pair<size_t, size_t>{wcols, wrows},
           [this](const std::string& cmd) { execute_cmd(cmd); }, get_logger()) {
+    get_logger().set_callback(
+        [this](const std::string& type, const std::string& msg) {
+            tui.add_log(type, msg);
+        });
+
     tui_thread = std::thread([this] {
         while (is_running()) {
             using namespace std::chrono_literals;
@@ -45,12 +50,36 @@ void EngoClient::execute_cmd(const std::string& input) {
             quit();
             break;
         case CommandType::HELP:
+            tui.send_help_msg();
             break;
         case CommandType::STOP:
             stop_network();
             break;
+        case CommandType::CONNECT:
+            if (cmd.args.size() != 2) {
+                get_logger().tlog(Logger::ERROR,
+                                  "usage: start <ip_addr> <port>");
+                break;
+            }
+            if (!user) {
+                user = std::make_unique<User>(
+                    cmd.args[0], static_cast<uint16_t>(std::stoul(cmd.args[1])),
+                    get_logger());
+
+                network_thread = std::thread([this] { user->run(); });
+                get_logger().tlog(Logger::INFO, "connected to ", cmd.args[0],
+                                  ":", cmd.args[1]);
+            } else {
+                get_logger().tlog(Logger::ERROR,
+                                  "you already connected to the server");
+            }
+
+            break;
         case CommandType::UNKNOWN:
             get_logger().tlog(Logger::ERROR, "unknown command");
+            break;
+        default:
+            get_logger().tlog(Logger::ERROR, "wrong command");
             break;
     }
 }
