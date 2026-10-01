@@ -30,6 +30,16 @@ void ClientTUI::send_help_msg() {
     console->get_message_list().add("engo-net", msg);
 }
 
+void ClientTUI::handle_network_msgs(const std::string& msg) {
+    size_t pos = msg.find(":");
+    if (pos == std::string::npos) return;
+
+    std::string author = msg.substr(0, pos);
+    std::string frmsg = msg.substr(pos + 1);
+
+    console->get_message_list().add(author, frmsg);
+}
+
 void ClientTUI::render() {
     buf.clear();
     make_header(CONFIG_ENGO_NAME + std::string(" ") + CONFIG_ENGO_VERSION +

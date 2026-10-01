@@ -19,6 +19,8 @@ class ClientTUI : public TUI {
 
     void send_help_msg();
 
+    void handle_network_msgs(const std::string& msg);
+
    private:
     engo::Pair<size_t, size_t> screen_meta;
 

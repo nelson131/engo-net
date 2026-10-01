@@ -2,8 +2,12 @@
 
 #include <iostream>
 
-User::User(const std::string& addr, uint16_t port, Logger& logger)
-    : logger(logger), tcpc(addr, port, logger), enabled(1) {
+User::User(const std::string& addr, uint16_t port, MessageCallback msg_callback,
+           Logger& logger)
+    : logger(logger),
+      tcpc(addr, port, logger),
+      enabled(1),
+      msg_callback(std::move(msg_callback)) {
     size_t attempts = 0;
     while (!tcpc.connect()) {
         if (attempts >= 5)
@@ -23,12 +27,11 @@ void User::run() {
         }
 
         while (auto packet = connection->get_ready_packet()) {
-            std::cout << "GOT PACKET!\n";
-
-            std::cout << "type: " << packet->header.type << '\n';
-            std::cout << "data: "
-                      << std::string(packet->data.begin(), packet->data.end())
-                      << '\n';
+            if (msg_callback &&
+                packet->header.type == engo::PacketType::MESSAGE) {
+                msg_callback(
+                    std::string(packet->data.begin(), packet->data.end()));
+            }
         }
     }
 }

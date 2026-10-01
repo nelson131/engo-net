@@ -64,6 +64,9 @@ void EngoClient::execute_cmd(const std::string& input) {
             if (!user) {
                 user = std::make_unique<User>(
                     cmd.args[0], static_cast<uint16_t>(std::stoul(cmd.args[1])),
+                    [this](const std::string& msg) {
+                        tui.handle_network_msgs(msg);
+                    },
                     get_logger());
 
                 network_thread = std::thread([this] { user->run(); });

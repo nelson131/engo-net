@@ -1,11 +1,17 @@
 #pragma once
 
+#include <functional>
+
 #include "../common/network/connection.hpp"
 #include "tcp_client.hpp"
 
 class User {
    public:
-    User(const std::string& addr, uint16_t port, Logger& logger);
+    using MessageCallback = std::function<void(const std::string&)>;
+
+   public:
+    User(const std::string& addr, uint16_t port, MessageCallback msg_callback,
+         Logger& logger);
 
     void run();
     void stop() noexcept;
@@ -22,4 +28,5 @@ class User {
 
     TCP_Client                  tcpc;
     std::unique_ptr<Connection> connection;
+    MessageCallback             msg_callback;
 };
