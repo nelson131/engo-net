@@ -19,4 +19,25 @@ void TUI::render() {}
 
 void TUI::handle_input() {}
 
-void TUI::make_header() {}
+void TUI::make_header(const std::string& title) {
+    // TOP SIDE
+    buf.put(engo::Pair<size_t, size_t>{0, 1}, title, COLOR_CYAN, COLOR_DEFAULT,
+            STYLE_BOLD);
+    buf.put(engo::Pair<size_t, size_t>{0, 2}, get_sep(), COLOR_DEFAULT,
+            COLOR_DEFAULT, STYLE_BOLD);
+
+    // BOTTOM SIDE
+    buf.put(engo::Pair<size_t, size_t>{0, buf.get_wrows() - 3}, get_sep(),
+            COLOR_DEFAULT, COLOR_DEFAULT, STYLE_BOLD);
+}
+
+void TUI::handle_console_input(Console& console, int key) {
+    if (key == InputHandler::BACKSPACE) {
+        console.get_input().backspace();
+        return;
+    }
+
+    if (key >= 32 && key <= 126) {
+        console.get_input().put(key);
+    }
+}

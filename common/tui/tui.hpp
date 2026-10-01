@@ -2,6 +2,8 @@
 
 #include "../config.hpp"
 #include "buffer.hpp"
+#include "console.hpp"
+#include "input_handler.hpp"
 
 class TUI {
    public:
@@ -19,7 +21,8 @@ class TUI {
     virtual void render();
     virtual void handle_input();
 
-    virtual void make_header();
+    void make_header(const std::string& title);
+    void handle_console_input(Console& console, int key);
 
    private:
     std::string sep;

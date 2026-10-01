@@ -43,8 +43,6 @@ class ServerTUI : public TUI {
     void render() override;
     void handle_input() override;
 
-    void make_header() override;
-
     void sumbit_console();
 
     void process_logs();
