@@ -7,6 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(SQLite3 REQUIRED)
+
 add_executable(engo-net
     main/main.cpp
     main/engo_net.cpp
@@ -32,4 +34,8 @@ add_executable(engo-net
     common/tui/text_input.cpp
     common/tui/console.cpp
     common/tui/input_handler.cpp
+)
+
+target_link_libraries(engo-net
+    SQLite::SQLite3
 )
