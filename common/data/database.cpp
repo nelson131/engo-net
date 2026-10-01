@@ -7,7 +7,7 @@
 #include <iostream>
 
 Database::Database() {
-    std::string file_name = "/data";
+    std::string file_name = "data";
     std::string path = engo::filesystem::get_main_dir(1) + file_name;
 
     if (!std::filesystem::exists(path)) {

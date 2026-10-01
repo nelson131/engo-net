@@ -78,6 +78,9 @@ void EngoClient::execute_cmd(const std::string& input) {
             }
 
             break;
+        case CommandType::ECHO_SEND:
+            user->send(cmd.args, 0);
+            break;
         case CommandType::UNKNOWN:
             get_logger().tlog(Logger::ERROR, "unknown command");
             break;
